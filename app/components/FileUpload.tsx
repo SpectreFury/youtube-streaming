@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import { useRef, SetStateAction, Dispatch } from "react";
 import { Cloud, CheckCircle } from "lucide-react";
 
-const FileUpload = () => {
-  const [file, setFile] = useState<File | null>(null);
+type FileUploadProps = {
+  file: File | null;
+  setFile: Dispatch<SetStateAction<File | null>>;
+};
+
+const FileUpload = ({ file, setFile }: FileUploadProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (

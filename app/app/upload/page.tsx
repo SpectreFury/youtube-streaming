@@ -8,7 +8,40 @@ import FileUpload from "@/components/FileUpload";
 
 const UploadPage = () => {
   const [title, setTitle] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [description, setDescription] = useState("");
+
+  const uploadToBucket = async () => {
+    try {
+      if (!file) return;
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload/sign-upload`,
+      );
+      const result = await response.json();
+
+      const { signature, timestamp, api_key, cloud_name } = result.data;
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", api_key);
+      formData.append("timestamp", timestamp);
+      formData.append("signature", signature);
+      formData.append("folder", "raw");
+
+      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloud_name}/video/upload`;
+
+      const uploadRes = await fetch(cloudinaryUrl, {
+        method: "POST",
+        body: formData,
+      });
+
+      const uploadData = await uploadRes.json();
+      console.log("Upload result: ", uploadData);
+    } catch (error) {
+      console.log("upload error: ", error);
+    }
+  };
 
   return (
     <main>
@@ -31,7 +64,7 @@ const UploadPage = () => {
 
         <div className="flex flex-col justify-center items-center">
           <div className="w-full flex items-center justify-center">
-            <FileUpload />
+            <FileUpload file={file} setFile={setFile} />
           </div>
 
           <div className="mt-10 min-w-120 bg-[#191c1e] rounded-2xl border border-gray-800 p-8 space-y-8">
@@ -63,7 +96,10 @@ const UploadPage = () => {
               />
             </div>
 
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-xl shadow-blue-900/20">
+            <button
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-xl shadow-blue-900/20"
+              onClick={uploadToBucket}
+            >
               Start Upload <ArrowRight className="w-5 h-5" />
             </button>
           </div>
