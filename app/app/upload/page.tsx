@@ -38,6 +38,27 @@ const UploadPage = () => {
 
       const uploadData = await uploadRes.json();
       console.log("Upload result: ", uploadData);
+
+      // Transcoding
+
+      const transcodeResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload/transcode`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            secure_url: uploadData.secure_url,
+            title,
+            description,
+            public_id: uploadData.public_id,
+          }),
+        },
+      );
+
+      const transcodeResult = await transcodeResponse.json();
+      console.log("Transcode result: ", transcodeResult);
     } catch (error) {
       console.log("upload error: ", error);
     }

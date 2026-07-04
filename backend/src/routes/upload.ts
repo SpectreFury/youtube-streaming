@@ -1,5 +1,6 @@
 import express from "express";
 import { cloudinary } from "../libs/cloudinary.js";
+import { queue } from "../libs/bullmq.js";
 
 const uploadRouter = express.Router();
 
@@ -24,6 +25,18 @@ uploadRouter.get("/sign-upload", (req, res) => {
       api_key: process.env.CLOUDINARY_API_KEY,
     },
   });
+});
+
+uploadRouter.post("/transcode", async (req, res) => {
+  try {
+    const { secure_url, title, description, public_id } = req.body;
+
+    // Send the data to worker
+    await queue.add("hls", { secure_url, public_id });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, error });
+  }
 });
 
 export default uploadRouter;

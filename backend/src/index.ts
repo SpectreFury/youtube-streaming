@@ -8,6 +8,7 @@ import uploadRouter from './routes/upload.js'
 const app = express()
 
 app.use(cors())
+app.use(express.json())
 
 const PORT = process.env.PORT
 
