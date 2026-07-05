@@ -22,6 +22,7 @@ const FileUpload = ({ file, setFile }: FileUploadProps) => {
           const file = e.target.files?.[0];
           setFile(file || null);
         }}
+        accept="video/*"
       />
 
       {file ? (

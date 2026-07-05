@@ -11,9 +11,10 @@ const connection = {
 const worker = new Worker(
   "hls",
   async (job) => {
-    console.log("New job: ", job);
+    console.log("==========JOB RECEIVED==========");
+    console.log("Job data: ", job.data);
 
-    return job;
+
   },
   { connection },
 );
@@ -23,9 +24,9 @@ worker.on("ready", () => {
 });
 
 worker.on("completed", (job) => {
-  console.log("Job completed: ", job);
+  console.log("Job completed")
 });
 
-worker.on("failed", (job) => {
-  console.log("Job failed: ", job);
+worker.on("failed", (job, error) => {
+  console.log("Job failed: ", error);
 });
