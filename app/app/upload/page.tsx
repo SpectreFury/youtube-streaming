@@ -53,6 +53,7 @@ const UploadPage = () => {
             title,
             description,
             public_id: uploadData.public_id,
+            extension: uploadData.format
           }),
         },
       );

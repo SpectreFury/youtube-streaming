@@ -29,11 +29,10 @@ uploadRouter.get("/sign-upload", (req, res) => {
 
 uploadRouter.post("/transcode", async (req, res) => {
   try {
-    const { secure_url, title, description, public_id } = req.body;
+    const { secure_url, title, description, public_id, extension } = req.body;
 
     // Send the data to worker
-    await queue.add("hls", { secure_url, public_id });
-
+    await queue.add("hls", { secure_url, public_id, extension });
   } catch (error) {
     return res.status(500).json({ success: false, error });
   }

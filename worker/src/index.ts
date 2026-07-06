@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { Worker } from "bullmq";
+import { videoTranscoding } from "./hls/transcode.js";
 
 const connection = {
   host: process.env.UPSTASH_REDIS_REST_URL!,
@@ -11,10 +12,18 @@ const connection = {
 const worker = new Worker(
   "hls",
   async (job) => {
-    console.log("==========JOB RECEIVED==========");
-    console.log("Job data: ", job.data);
+    try {
+      console.log("==========JOB RECEIVED==========");
+      console.log("Job data: ", job.data);
 
-
+      await videoTranscoding(
+        job.data.secure_url,
+        job.data.public_id,
+        job.data.extension,
+      );
+    } catch (error) {
+      console.log("Job failed: ", error);
+    }
   },
   { connection },
 );
@@ -24,7 +33,7 @@ worker.on("ready", () => {
 });
 
 worker.on("completed", (job) => {
-  console.log("Job completed")
+  console.log("Job completed");
 });
 
 worker.on("failed", (job, error) => {
