@@ -55,7 +55,36 @@ const ffmpegTransformations = async (
         });
     });
 
-    console.log("Thumbnail saved at: ", outputPath);
+    await new Promise<void>((resolve, reject) => {
+      ffmpeg(savePath)
+        .videoCodec("libx264")
+        .outputOptions(["-crf 21", "-preset fast"])
+
+        .audioCodec("aac")
+        .audioBitrate("128k")
+
+        .format("hls")
+        .outputOptions([
+          "-hls_time 6",
+          "-hls_playlist_type vod",
+          `-hls_segment_filename ${path.join(outputPath, "segment_%03d.ts")}`,
+        ])
+
+        .output(path.join(outputPath, `${filename}.m3u8`))
+        .on("end", () => {
+          console.log("HLS conversion completed successfully");
+          resolve();
+        })
+        .on("error", (error) => {
+          console.log("HLS conversion failed: ", error);
+          reject();
+        })
+        .on("progress", (progress) => {
+          console.log("Processing: ", progress.percent);
+        })
+
+        .run();
+    });
   } catch (error) {
     console.log("Error in transformation of video: ", error);
   }
