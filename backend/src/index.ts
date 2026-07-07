@@ -1,19 +1,24 @@
-import 'dotenv/config'
-import express from 'express'
+import "dotenv/config";
+import express from "express";
+import mongoose from 'mongoose'
 
-import cors from 'cors'
+import cors from "cors";
 
-import uploadRouter from './routes/upload.js'
+import uploadRouter from "./routes/upload.js";
+import watchRouter from "./routes/watch.js";
 
-const app = express()
+const app = express();
 
-app.use(cors())
-app.use(express.json())
+mongoose.connect(process.env.MONGODB_URI!)
 
-const PORT = process.env.PORT
+app.use(cors());
+app.use(express.json());
 
-app.use("/api/upload", uploadRouter)
+const PORT = process.env.PORT;
+
+app.use("/api/upload", uploadRouter);
+app.use("/api/watch", watchRouter);
 
 app.listen(PORT, () => {
-  console.log(`Listening on PORT ${PORT}`)
-})
+  console.log(`Listening on PORT ${PORT}`);
+});

@@ -33,6 +33,7 @@ const ffmpegTransformations = async (
   savePath: string,
   filename: string,
   rootDir: string,
+  title: string
 ) => {
   try {
     const outputPath = path.join(rootDir, `transformed/${filename}`);
@@ -128,7 +129,7 @@ const ffmpegTransformations = async (
     console.log("Cleaned up raw and hls files");
 
     await Video.create({
-      name: filename,
+      name: title,
       hlsUrl: playlistUrl,
       thumbnailUrl,
       status: "READY",
@@ -142,6 +143,7 @@ const videoTranscoding = async (
   secure_url: string,
   public_id: string,
   extension: string,
+  title: string
 ) => {
   const filename = public_id.split("/")[1]!;
   const rootDir = path.join(__dirname, "../../");
@@ -153,7 +155,7 @@ const videoTranscoding = async (
   );
 
   await downloadFileToDisk(secure_url, savePath);
-  await ffmpegTransformations(savePath, filename, rootDir);
+  await ffmpegTransformations(savePath, filename, rootDir, title);
 };
 
 export { videoTranscoding };

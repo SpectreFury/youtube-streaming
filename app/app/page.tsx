@@ -47,7 +47,15 @@ const VIDEOS = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL!}/api/watch`,
+  );
+
+  const result = await response.json();
+  const videos = result.data;
+  console.log(videos);
+
   return (
     <main>
       <div className="container mx-auto">
@@ -67,9 +75,10 @@ export default function Home() {
         </section>
 
         <section className="mt-10 flex flex-wrap gap-6">
-          {VIDEOS.map((video) => (
+          {videos.map((video: any) => (
             <VideoCard
-              key={video.id}
+              id={video._id}
+              key={video._id}
               thumbnailUrl={video.thumbnailUrl}
               name={video.name}
               duration={video.duration}

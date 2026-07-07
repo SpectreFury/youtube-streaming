@@ -21,6 +21,7 @@ const worker = new Worker(
         job.data.secure_url,
         job.data.public_id,
         job.data.extension,
+        job.data.title
       );
     } catch (error) {
       console.log("Job failed: ", error);
