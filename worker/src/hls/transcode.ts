@@ -1,8 +1,10 @@
 import ffmpeg from "fluent-ffmpeg";
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile, mkdir, readdir, rm } from "fs/promises";
 import path from "path";
 import { Readable } from "stream";
 import { fileURLToPath } from "url";
+import { cloudinary } from "../libs/cloudinary.js";
+import { Video } from "../models/video.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,6 +86,52 @@ const ffmpegTransformations = async (
         })
 
         .run();
+    });
+
+    const files = await readdir(outputPath);
+    console.log("Files: ", files);
+
+    const uploadPromises = files.map(async (file) => {
+      const filePath = path.join(outputPath, file);
+
+      const isThumbnail = file.endsWith(".jpg") || file.endsWith(".png");
+      const resourceType = isThumbnail ? "image" : "raw";
+
+      const cloudinaryFolder = `transformed/${filename}`;
+
+      const uploadResult = await cloudinary.uploader.upload(filePath, {
+        folder: cloudinaryFolder,
+        use_filename: true,
+        unique_filename: false,
+        resource_type: resourceType,
+      });
+
+      return uploadResult;
+    });
+
+    const uploadResults = await Promise.all(uploadPromises);
+    console.log("All files successfully uploaded to Cloudinary");
+
+    const playlistUrl = uploadResults.find((res) =>
+      res.secure_url.endsWith(".m3u8"),
+    )?.secure_url;
+
+    const thumbnailUrl = uploadResults.find((res) =>
+      res.secure_url.endsWith(".jpg"),
+    )?.secure_url;
+
+    console.log("Playlist URL: ", playlistUrl);
+
+    await rm(outputPath, { recursive: true, force: true });
+    await rm(savePath, { force: true });
+
+    console.log("Cleaned up raw and hls files");
+
+    await Video.create({
+      name: filename,
+      hlsUrl: playlistUrl,
+      thumbnailUrl,
+      status: "READY",
     });
   } catch (error) {
     console.log("Error in transformation of video: ", error);

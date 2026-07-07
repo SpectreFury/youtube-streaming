@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { Worker } from "bullmq";
 import { videoTranscoding } from "./hls/transcode.js";
+import mongoose from "mongoose";
 
 const connection = {
   host: process.env.UPSTASH_REDIS_REST_URL!,
@@ -28,8 +29,15 @@ const worker = new Worker(
   { connection },
 );
 
-worker.on("ready", () => {
-  console.log("Worker ready");
+worker.on("ready", async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI!);
+
+    console.log("Database connected")
+    console.log("Worker ready");
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 worker.on("completed", (job) => {
