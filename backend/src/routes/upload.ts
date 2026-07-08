@@ -32,7 +32,15 @@ uploadRouter.post("/transcode", async (req, res) => {
     const { secure_url, title, description, public_id, extension } = req.body;
 
     // Send the data to worker
-    await queue.add("hls", { secure_url, public_id, extension, title, description });
+    await queue.add("hls", {
+      secure_url,
+      public_id,
+      extension,
+      title,
+      description,
+    });
+
+    return res.status(200).json({ success: true });
   } catch (error) {
     return res.status(500).json({ success: false, error });
   }

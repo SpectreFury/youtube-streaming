@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
@@ -10,9 +11,13 @@ const UploadPage = () => {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const uploadToBucket = async () => {
     try {
+      setLoading(true);
       if (!file) return;
 
       const response = await fetch(
@@ -53,13 +58,16 @@ const UploadPage = () => {
             title,
             description,
             public_id: uploadData.public_id,
-            extension: uploadData.format
+            extension: uploadData.format,
           }),
         },
       );
 
       const transcodeResult = await transcodeResponse.json();
       console.log("Transcode result: ", transcodeResult);
+
+      setLoading(false);
+      router.replace("/");
     } catch (error) {
       console.log("upload error: ", error);
     }
@@ -119,6 +127,7 @@ const UploadPage = () => {
             </div>
 
             <button
+              disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-xl shadow-blue-900/20"
               onClick={uploadToBucket}
             >
