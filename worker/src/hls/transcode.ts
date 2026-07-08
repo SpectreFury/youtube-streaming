@@ -33,7 +33,7 @@ const ffmpegTransformations = async (
   savePath: string,
   filename: string,
   rootDir: string,
-  title: string
+  title: string,
 ) => {
   try {
     const outputPath = path.join(rootDir, `transformed/${filename}`);
@@ -143,7 +143,7 @@ const videoTranscoding = async (
   secure_url: string,
   public_id: string,
   extension: string,
-  title: string
+  title: string,
 ) => {
   const filename = public_id.split("/")[1]!;
   const rootDir = path.join(__dirname, "../../");
@@ -156,6 +156,12 @@ const videoTranscoding = async (
 
   await downloadFileToDisk(secure_url, savePath);
   await ffmpegTransformations(savePath, filename, rootDir, title);
+
+  console.log(public_id);
+  const result = await cloudinary.uploader.destroy(public_id, {
+    resource_type: "video",
+  });
+  console.log("Deleted result: ", result);
 };
 
 export { videoTranscoding };
