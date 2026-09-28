@@ -7,6 +7,11 @@ const VideoSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     hlsUrl: {
       type: String,
       default: null,

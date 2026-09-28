@@ -1,55 +1,18 @@
 import VideoCard from "@/components/VideoCard";
-import Image from "next/image";
 import Link from "next/link";
 
-const VIDEOS = [
-  {
-    id: 1,
-    thumbnailUrl: "thumbnail.jpg",
-    duration: "12 min",
-    name: "Youtube Thumbnail Videos",
-    date: "12 Oct, 2024",
-  },
-  {
-    id: 2,
-    thumbnailUrl: "thumbnail.jpg",
-    duration: "12 min",
-    name: "Youtube Thumbnail Videos",
-    date: "12 Oct, 2024",
-  },
-  {
-    id: 3,
-    thumbnailUrl: "thumbnail.jpg",
-    duration: "12 min",
-    name: "Youtube Thumbnail Videos",
-    date: "12 Oct, 2024",
-  },
-  {
-    id: 4,
-    thumbnailUrl: "thumbnail.jpg",
-    duration: "12 min",
-    name: "Youtube Thumbnail Videos",
-    date: "12 Oct, 2024",
-  },
-  {
-    id: 5,
-    thumbnailUrl: "thumbnail.jpg",
-    duration: "12 min",
-    name: "Youtube Thumbnail Videos",
-    date: "12 Oct, 2024",
-  },
-  {
-    id: 6,
-    thumbnailUrl: "thumbnail.jpg",
-    duration: "12 min",
-    name: "Youtube Thumbnail Videos",
-    date: "12 Oct, 2024",
-  },
-];
+interface HomeVideo {
+  _id: string;
+  thumbnailUrl: string;
+  name: string;
+  duration: string;
+  date: string;
+}
 
 export default async function Home() {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL!}/api/watch`,
+    { cache: "no-store" },
   );
 
   const result = await response.json();
@@ -75,7 +38,7 @@ export default async function Home() {
         </section>
 
         <section className="mt-10 flex flex-wrap gap-6">
-          {videos.map((video: any) => (
+          {videos.map((video: HomeVideo) => (
             <VideoCard
               id={video._id}
               key={video._id}

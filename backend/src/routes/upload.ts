@@ -31,8 +31,15 @@ uploadRouter.post("/transcode", async (req, res) => {
   try {
     const { secure_url, title, description, public_id, extension } = req.body;
 
+    if (!secure_url || !public_id || !extension) {
+      return res.status(400).json({
+        success: false,
+        message: "secure_url, public_id and extension are required",
+      });
+    }
+
     // Send the data to worker
-    await queue.add("hls", {
+    const job = await queue.add("hls", {
       secure_url,
       public_id,
       extension,
@@ -40,7 +47,9 @@ uploadRouter.post("/transcode", async (req, res) => {
       description,
     });
 
-    return res.status(200).json({ success: true });
+    console.log("Enqueued hls job:", job.id);
+
+    return res.status(200).json({ success: true, jobId: job.id });
   } catch (error) {
     return res.status(500).json({ success: false, error });
   }

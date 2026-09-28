@@ -23,6 +23,8 @@ watchRouter.get("/", async (req, res) => {
   try {
     const videos = await Video.find();
 
+    console.log(videos)
+
     return res.status(200).json({ success: true, data: videos });
   } catch (error) {
     return res.status(500).json({ success: false, error });
